@@ -121,7 +121,7 @@ bbox_metropole <- st_bbox(c(xmin = -20, ymin = 40, xmax = 20, ymax = 90),
 regions_map_metro <- st_crop(regions_map, bbox_metropole)
 
 # c) Tracer
-png("figures/03_carte_prevalence_region_metro.png", width = 800, height = 600)
+png("figures/03_carte_prevalence_par_region_metropolitaine.png", width = 800, height = 600)
 ggplot(regions_map_metro) +
   geom_sf(aes(fill = Prevalence), color = "white", size = 0.2) +
   scale_fill_viridis_c(option = "magma", na.value = "grey90") +
@@ -171,7 +171,7 @@ fig5 <- data %>%
   geom_line(size = 1) +
   labs(
     title = "Évolution de la prévalence des 5 principales pathologies",
-    x     = "Année", y = "En % de Prevalence",
+    x     = "Année", y = "% Prevalence",
     color = "Pathologie"
   ) +
   theme_minimal()
