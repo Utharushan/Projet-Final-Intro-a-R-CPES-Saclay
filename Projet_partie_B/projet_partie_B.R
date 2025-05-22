@@ -9,7 +9,6 @@ library(sf)             # gestion géométries
 library(viridis)        # palettes de couleurs
 
 # Lecture du fichier CSV
-# Le fichier "Projet_partie_B.csv" doit être placé dans le même répertoire que ce script
 data_raw <- read_csv("Projet_partie_B.csv", locale = locale(encoding = "UTF-8"))
 
 # Aperçu et nettoyage
@@ -47,6 +46,8 @@ data <- data_raw %>%
 # Création d'un dossier pour les graphiques
 if (!dir.exists("figures")) dir.create("figures")
 
+#-------------------------------------------------------------------------------
+
 # 1) Évolution du nombre total de patients pris en charge par année
 png("figures/01_total_patients_par_annee.png", width = 800, height = 500)
 fig1 <- data %>%
@@ -62,6 +63,8 @@ fig1 <- data %>%
   theme_minimal()
 print(fig1)
 dev.off()
+
+#-------------------------------------------------------------------------------
 
 # 2) Répartition des pathologies de niveau 1 pour la dernière année disponible
 png("figures/02_top10_patho1.png", width = 800, height = 600)
@@ -82,8 +85,9 @@ fig2 <- data %>%
 print(fig2)
 dev.off()
 
-# 3) Carte de la prévalence moyenne par région pour une pathologie donnée (ex: maladies cardioneurovasculaires)
+#-------------------------------------------------------------------------------
 
+# 3) Carte de la prévalence moyenne par région pour une pathologie donnée (ex: maladies cardioneurovasculaires)
 # Lecture du shapefile des régions
 regions_sf <- st_read("shapefile/regions_shapefile.shp",
                       options = "ENCODING=UTF-8",
@@ -96,14 +100,8 @@ regions_sf <- st_read("shapefile/regions_shapefile.shp",
 data <- data %>%
   mutate(Code_region = as.character(Code_region))
 
-# Supposons que la bonne colonne est "INSEE_REG" ou "code" ou similaire, sinon adapter ici
-# Par exemple :
-# regions_sf <- regions_sf %>%
-#   rename(CdRegion = INSEE_REG)
-
-# On transforme aussi cette colonne au format character
 regions_sf <- regions_sf %>%
-  mutate(CdRegion = as.character(CdRegion)) # remplacer CdRegion si nécessaire
+  mutate(CdRegion = as.character(CdRegion))
 
 # Calcul de la prévalence moyenne par région pour la pathologie ciblée
 prevalence_reg <- data %>%
@@ -115,14 +113,14 @@ prevalence_reg <- data %>%
 regions_map <- regions_sf %>%
   left_join(prevalence_reg, by = c("CdRegion" = "Code_region"))
 
-# 1) Construire la bounding-box métropole
+# a) Construire la bounding-box pour la métropole
 bbox_metropole <- st_bbox(c(xmin = -20, ymin = 40, xmax = 20, ymax = 90),
                           crs = st_crs(regions_map))
 
-# 2) Rogner la carte
+# b) Rogner la carte
 regions_map_metro <- st_crop(regions_map, bbox_metropole)
 
-# 3) Tracer
+# c) Tracer
 png("figures/03_carte_prevalence_region_metro.png", width = 800, height = 600)
 ggplot(regions_map_metro) +
   geom_sf(aes(fill = Prevalence), color = "white", size = 0.2) +
@@ -135,7 +133,7 @@ ggplot(regions_map_metro) +
   theme_minimal()
 dev.off()
 
-
+#-------------------------------------------------------------------------------
 
 # 4) Heatmap de la prévalence selon classe d'âge et sexe pour la dernière année
 png("figures/04_heatmap_age_sexe.png", width = 800, height = 500)
@@ -155,6 +153,8 @@ fig4 <- data %>%
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 print(fig4)
 dev.off()
+
+#-------------------------------------------------------------------------------
 
 # 5) Évolution de la prévalence des 5 pathologies principales au fil des années
 png("figures/05_evol_prev_top5.png", width = 800, height = 500)
@@ -178,6 +178,8 @@ fig5 <- data %>%
 print(fig5)
 dev.off()
 
+#-------------------------------------------------------------------------------
+
 # 6) Distribution de la prévalence par département (boxplot)
 png("figures/06_boxplot_departement.png", width = 800, height = 500)
 fig6 <- data %>%
@@ -192,6 +194,8 @@ fig6 <- data %>%
   theme_minimal()
 print(fig6)
 dev.off()
+
+#-------------------------------------------------------------------------------
 
 # 7) Diagramme circulaire : répartition des sexes pour la pathologie la plus fréquente
 png("figures/07_pie_sexe_patho.png", width = 800, height = 500)
@@ -209,6 +213,8 @@ fig7 <- data %>%
 print(fig7)
 dev.off()
 
+#-------------------------------------------------------------------------------
+
 # 8) Scatter plot : population vs nombre de patients pour la pathologie la plus fréquente
 png("figures/08_scatter_pop_vs_patients.png", width = 800, height = 500)
 fig8 <- data %>%
@@ -224,6 +230,8 @@ fig8 <- data %>%
 print(fig8)
 dev.off()
 
+#-------------------------------------------------------------------------------
+
 # 9) Boxplot de la prévalence par pathologie de niveau 1
 png("figures/09_boxplot_patho1.png", width = 800, height = 500)
 fig9 <- data %>%
@@ -237,6 +245,8 @@ fig9 <- data %>%
   theme_minimal()
 print(fig9)
 dev.off()
+
+#-------------------------------------------------------------------------------
 
 # 10) Heatmap temporelle : prévalence des pathologies sur les années
 png("figures/10_heatmap_patho_temps.png", width = 800, height = 500)
