@@ -16,6 +16,8 @@ colnames(data) <- c("Date", "Conso", "Temp_moy", "Temp_ref")
 # Conversion de la colonne Date en type Date R
 data$Date <- as.Date(data$Date)
 
+#-------------------------------------------------------------------------------
+
 # 1) Tracer l’évolution du pic journalier de consommation
 png("graphique_conso.png", width = 800, height = 500)
 ggplot(data, aes(x = Date, y = Conso)) +
@@ -24,6 +26,8 @@ ggplot(data, aes(x = Date, y = Conso)) +
        x = "Date", y = "Consommation (MW)") +
   theme_minimal()                                              # thème épuré
 dev.off()
+
+#-------------------------------------------------------------------------------
 
 # 2) Tracer la Température moyenne et de référence dans le temps
 png("graphique_temps.png", width = 800, height = 500)
@@ -37,13 +41,19 @@ ggplot(data) +
   theme_minimal()
 dev.off()
 
-# 3) Calcul des moyennes mensuelles de consommation
-data$Mois <- month(data$Date, label = TRUE, abbr = TRUE)   # extraire le mois (étiquettes Jan–Déc)
-moyennes_mensuelles <- data %>%
-  group_by(Mois) %>%                                       # par mois
-  summarise(Conso_moy = mean(Conso, na.rm = TRUE))         # moyenne de Conso
+#-------------------------------------------------------------------------------
 
-# Tracer un barplot des moyennes mensuelles
+# 3) Calcul des moyennes mensuelles de consommation et de température
+data$Mois <- month(data$Date, label = TRUE, abbr = TRUE)  # extraire le mois (étiquettes Jan–Déc)
+
+moyennes_mensuelles <- data %>%
+  group_by(Mois) %>%
+  summarise(
+    Conso_moy     = mean(Conso,       na.rm = TRUE),
+    Temp_moy_mois = mean(Temp_moy,    na.rm = TRUE)
+  )
+
+# a) Tracer un barplot des moyennes mensuelles
 png("conso_moyenne_par_mois.png", width = 800, height = 500)
 ggplot(moyennes_mensuelles, aes(x = Mois, y = Conso_moy)) +
   geom_col(fill = "skyblue") +
@@ -51,6 +61,51 @@ ggplot(moyennes_mensuelles, aes(x = Mois, y = Conso_moy)) +
        x = "Mois", y = "Consommation moyenne (MW)") +
   theme_minimal()
 dev.off()
+
+# b) Barplot des moyennes mensuelles de température
+png("temp_moyenne_par_mois.png", width = 800, height = 500)
+ggplot(moyennes_mensuelles, aes(x = Mois, y = Temp_moy_mois)) +
+  geom_col(fill = "salmon") +
+  labs(
+    title = "Température moyenne par mois",
+    x     = "Mois",
+    y     = "Température moyenne (°C)"
+  ) +
+  theme_minimal()
+dev.off()
+
+# c) Barplot fusionné des moyennes mensuelles de consommation et de température
+# On met la température sur une échelle relative pour que la superposition soit lisible
+facteur_mois <- max(moyennes_mensuelles$Conso_moy) / max(moyennes_mensuelles$Temp_moy_mois)
+
+png("conso_temp_moyennes_par_mois_superpose.png", width = 800, height = 500)
+ggplot(moyennes_mensuelles, aes(x = Mois)) +
+  # Barres de consommation
+  geom_col(aes(y = Conso_moy, fill = "Consommation"), width = 0.6, alpha = 0.8) +
+  # Barres de température mises à l'échelle
+  geom_col(aes(y = Temp_moy_mois * facteur_mois, fill = "Température"), 
+           width = 0.4, alpha = 0.8) +
+  scale_y_continuous(
+    name    = "Consommation moyenne (MW)",
+    sec.axis = sec_axis(~ . / facteur_mois, name = "Température moyenne (°C)")
+  ) +
+  scale_fill_manual(
+    name   = "",
+    values = c("Consommation" = "skyblue", "Température" = "salmon")
+  ) +
+  labs(
+    title = "Consommation et température moyennes par mois",
+    x     = "Mois"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position    = "bottom",
+    axis.title.y.right = element_text(color = "salmon"),
+    axis.text.y.right  = element_text(color = "salmon")
+  )
+dev.off()
+
+#-------------------------------------------------------------------------------
 
 # 4) Ajustement d’un modèle de régression linéaire simple
 modele <- lm(Conso ~ Temp_moy, data = data)
@@ -66,9 +121,13 @@ ggplot(data, aes(x = Temp_moy, y = Conso)) +
   theme_minimal()
 dev.off()
 
+#-------------------------------------------------------------------------------
+
 # 5) Calcul de la corrélation linéaire
 cor_temp <- cor(data$Temp_moy, data$Conso, use = "complete.obs")
 print(paste("Corrélation Tempér./Consommation :", round(cor_temp, 3)))
+
+#-------------------------------------------------------------------------------
 
 # 6) Fusionner consommation et température sur le même graphique
 #    – on met la température sur un axe secondaire via mise à l'échelle
