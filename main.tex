@@ -1,45 +1,68 @@
-% !TEX encoding = UTF-8 Unicode
 \documentclass[12pt,a4paper]{article}
 
-% Langue et encodage
 \usepackage[french]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-
-% Marges
 \usepackage[a4paper,top=2cm,bottom=2cm,left=3cm,right=3cm]{geometry}
-
-% Graphiques, tableaux, mathématiques, hyperliens
 \usepackage{graphicx}
-\usepackage{amsmath,amsfonts,amssymb}
+\usepackage{wrapfig}
 \usepackage{booktabs}
-\usepackage[colorlinks=true, allcolors=blue]{hyperref}
-\usepackage{float}
+\usepackage{amsmath}
 
-% En-têtes et pieds de page
+% liens en bleu
+\usepackage[colorlinks=true,
+            linkcolor=blue,
+            urlcolor=blue,
+            citecolor=blue]{hyperref}
+
+\usepackage{float}
+\usepackage{titling}
+\setlength{\droptitle}{-4em}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\vskip 1.5em\end{center}}
+\preauthor{\begin{center}\large}
+\postauthor{\par\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
 \usepackage{fancyhdr}
 \pagestyle{fancy}
 \fancyhf{}
-\rhead{Projet CPES2}
-\lhead{Analyse R}
+\rhead{\leftmark}
+\lhead{Projet CPES2}
 \rfoot{\thepage}
 
-% Métadonnées
 \title{Rapport Projet CPES2 2025\\Analyse de données sous R}
-\author{\href{https://www.linkedin.com/in/utharushan/}{UTHAYAKUMAR Tharushan}\\\href{mailto:tharushan.uthayakumar@hec.edu}{tharushan.uthayakumar@hec.edu}}
-\date{23 mai 2025}
+\author{%
+  \href{https://www.linkedin.com/in/utharushan/}{\textbf{UTHAYAKUMAR Tharushan}}\\[0.5em]
+  \href{mailto:tharushan.uthayakumar@hec.edu}{tharushan.uthayakumar@hec.edu}
+}
+\date{23 mai 2025}
 
 \begin{document}
-
-\maketitle
+\begin{titlepage}
+  \centering
+  \vspace*{2cm}
+  {\LARGE\bfseries Rapport Projet CPES2 2025\par}
+  \vspace{1em}
+  {\Large Analyse de données sous R\par}
+  \vfill
+  {\large\textbf{UTHAYAKUMAR Tharushan}\par}
+  \vspace{0.5em}
+  {\small\href{mailto:tharushan.uthayakumar@hec.edu}{tharushan.uthayakumar@hec.edu}\par}
+  \vspace{1em}
+  {\small\href{https://github.com/Utharushan/Projet-Final-Intro-a-R-CPES-Saclay}{Dépôt GitHub associé}\par}
+  \vfill
+  {\normalsize 23 mai 2025\par}
+\end{titlepage}
 
 \begin{abstract}
 Ce rapport présente deux analyses distinctes réalisées sous R (version 4.5.0) :
 \begin{itemize}
   \item \textbf{Partie A} : étude de l'influence de la température moyenne sur le pic journalier de consommation électrique (2012--2025), via une régression linéaire simple, révélant une relation négative forte (R\textsuperscript{2} = 0,69).
-  \item \textbf{Partie B} : exploration des données d'effectifs de patients par pathologie, sexe, classe d'âge et territoire (départements, régions), avec visualisations (cartes, heatmaps, évolutions temporelles, etc.), afin de décrire la répartition et les tendances des prévalences.
+  \item \textbf{Partie B} : exploration des données d'effectifs de patients par pathologie, sexe, classe d'âge et territoire (départements, régions), avec visualisations (cartes, heatmaps, évolutions temporelles), afin de décrire la répartition et les tendances des prévalences.
 \end{itemize}
-Les méthodologies utilisées font appel aux packages \texttt{ggplot2}, \texttt{dplyr}, \texttt{lubridate}, \texttt{sf} et \texttt{viridis}. Le code reproductible est disponible dans le \href{https://github.com/Utharushan/Projet-Final-Intro-a-R-CPES-Saclay}{dépôt GitHub associé}.
+Les méthodologies font appel aux packages \texttt{ggplot2}, \texttt{dplyr}, \texttt{lubridate}, \texttt{sf} et \texttt{viridis}. Le code est disponible sur le dépôt GitHub ci-dessus.
 \end{abstract}
 
 \newpage
@@ -75,39 +98,31 @@ Lectures, conversion de la colonne \texttt{Date}, calcul de moyennes mensuelles,
 
 \begin{figure}[H]
   \centering
-  \begin{minipage}[t]{0.48\textwidth}
+  \begin{minipage}[t]{0.9\textwidth}
     \centering
     \includegraphics[width=\linewidth]{Projet_partie_A/conso_temp_moyennes_par_mois_superpose.png}
     \caption{Consommation et température moyennes par mois}
     \label{fig:conso_temp_mois}
   \end{minipage}
-  \hfill
-  \begin{minipage}[t]{0.48\textwidth}
-    \small
     \begin{itemize}
       \item Les mois froids (janv.–fév.) ont une basse température et une haute consommation.  
       \item En été (juil.–août), température élevée et consommation minimale.  
       \item Confirme l’impact direct de la température sur la demande électrique.  
     \end{itemize}
-  \end{minipage}
 \end{figure}
 
 \begin{figure}[H]
   \centering
-  \begin{minipage}[t]{0.5\textwidth}
+  \begin{minipage}[t]{0.9\textwidth}
     \centering
     \includegraphics[width=\linewidth]{Projet_partie_A/conso_vs_temp_superpose.png}
-    \caption{Superposition Conso & Température (2012–2025)}
+    \caption{Superposition Consommation \& Température (2012–2025)}
     \label{fig:timeseries_conso_temp}
   \end{minipage}
-  \hfill
-  \begin{minipage}[t]{0.48\textwidth}
-    \small
     \begin{itemize}
       \item Cycles saisonniers opposés : consommation haute quand température basse et vice-versa.  
       \item Calage immédiat, illustrant une dépendance sans délai notable.  
     \end{itemize}
-  \end{minipage}
 \end{figure}
 
 \subsection{Modèle de régression linéaire}
@@ -135,8 +150,8 @@ Les résultats du modèle sont présentés dans le tableau ci‑dessous :
 \paragraph{Qualité de l’ajustement}
 \begin{itemize}
   \item $R^2 = 0.688$, $R^2_{\mathrm{adj}} = 0.688$: la température moyenne explique 68,8\,\% de la variance du pic de consommation.
-  \item Statistique $F = 1{,}06 \times 10^4$ (ddl : 1 et 3650), $p-valeur < 2{,}2\times10^{-16}$ : rejet très significatif de l’hypothèse nulle $H_0: \beta_1 = 0$ donc la pente n’est pas nulle.
-  \item Erreur résiduelle standard (RMSE) : 6\,337 MW.
+  \item Statistique $F = 1{,}06 \times 10^4$ (ddl : 1 et 3650), $p-valeur < 2{,}2\times10^{-16}$ : rejet très significatif de l’hypothèse nulle $H_0: \beta_1 = 0$, ce qui confirme l’existence d’une relation linéaire entre température et consommation.
+  \item Le coefficient $\beta_1 = -1\,496.4$ indique qu’une augmentation de la température moyenne d’un degré Celsius est associée, en moyenne, à une baisse d’environ $1\,500\,$MW du pic journalier de consommation.
 \end{itemize}
 
 \subsection{Conclusions Partie A}
@@ -149,7 +164,7 @@ Pour approfondir l’analyse, on pourrait :
 \end{itemize}
 \newpage
 \section{Partie B -- Pathologies : effectifs par territoire, âge et sexe}
-\subsection{Contexte et objectifs}
+\subsection{Contexte et objectif}
 Le second jeu de données (accessible sur \href{https://data.ameli.fr/explore/dataset/effectifs/information/}{data.ameli.fr}) présente pour les années 2019--2022 :
 \begin{itemize}
   \item les effectifs de patients par pathologie,
@@ -170,32 +185,27 @@ en mettant en évidence les disparités selon l’âge, le sexe et le territoire
 
 \begin{figure}[H]
   \centering
-  \begin{minipage}[t]{0.52\textwidth}
+  \begin{minipage}[t]{0.6\textwidth}
     \centering
     \includegraphics[width=\linewidth]{Projet_partie_B/01_total_patients_par_annee.png}
     \caption{Évolution du nombre total de patients par année}
     \label{fig:total_patients}
   \end{minipage}
-  \hfill
-  \begin{minipage}[t]{0.48\textwidth}
-    \small
     \begin{itemize}
       \item Une augmentation quasi linéaire du total de patients, passant d’environ 48,5 M en 2019 à 50,5 M en 2022.  
       \item Un signal régulier sans plateau, suggérant une croissance continue de la demande de soins ou de la couverture de données.  
       \item L’absence de point d'inflexion indique aucune rupture majeure (crise sanitaire ou changement de méthodologie).  
     \end{itemize}
-  \end{minipage}
 \end{figure}
 
 \begin{figure}[H]
   \centering
-  \begin{minipage}[t]{0.6\textwidth}
+  \begin{minipage}[t]{0.7\textwidth}
     \centering
     \includegraphics[width=\linewidth]{Projet_partie_B/02_top10_patho1.png}
     \caption{Top 10 des pathologies (niv.1) en 2022}
     \label{fig:top10_patho}
   \end{minipage}
-  \hfill
     \begin{itemize}
       \item Les maladies cardiovasculaires en tête (~16 M de patients), puis cancers (~11 M) et psychiatriques (~7 M).  
       \item Diabète et maladies inflammatoires/VIH autour de 4–5 M, position médiane.  
@@ -205,133 +215,112 @@ en mettant en évidence les disparités selon l’âge, le sexe et le territoire
 
 \begin{figure}[H]
   \centering
-  \begin{minipage}[t]{0.5\textwidth}
+  \begin{minipage}[t]{0.7\textwidth}
     \centering
     \includegraphics[width=\linewidth]{Projet_partie_B/03_carte_prevalence_par_region_metropolitaine.png}
     \caption{Prévalence des maladies cardiovasculaires (Métropole)}
     \label{fig:carte_prevalence}
   \end{minipage}
-  \hfill
-  \begin{minipage}[t]{0.48\textwidth}
-    \small
     \begin{itemize}
       \item Île-de-France la plus faible (~4 \%), Grand Est et Bourgogne-Franche-Comté élevées (≈5,5 \%).  
-      \item Arc Est et Sud-Ouest plus exposés, possiblement dû à facteurs de risque régionaux.  
+      \item Arc Est et Sud-Ouest plus exposés, possiblement dû à des facteurs de risque régionaux.  
       \item Rognage sur la métropole améliore la clarté en supprimant les DOM-TOM.  
     \end{itemize}
-  \end{minipage}
 \end{figure}
 
 \begin{figure}[H]
   \centering
-  \begin{minipage}[t]{0.48\textwidth}
+  \begin{minipage}[t]{1\textwidth}
     \centering
     \includegraphics[width=\linewidth]{Projet_partie_B/04_heatmap_age_sexe.png}
     \caption{Heatmap prévalence par âge et sexe en 2022}
     \label{fig:heatmap_age_sexe}
   \end{minipage}
-  \hfill
-  \begin{minipage}[t]{0.48\textwidth}
-    \small
-    Cette figure montre :
     \begin{itemize}
       \item Croissance exponentielle de la prévalence avec l’âge, de <1 \% (<40 ans) à >10 \% (>85 ans).  
       \item Légère surreprésentation masculine chez les 65 ans et plus.  
       \item Catégorie « tous sexes » (NA) regroupe des valeurs intermédiaires, moins discriminantes.  
     \end{itemize}
-  \end{minipage}
 \end{figure}
 
 \begin{figure}[H]
   \centering
-  \begin{minipage}[t]{0.48\textwidth}
+  \begin{minipage}[t]{0.8\textwidth}
     \centering
     \includegraphics[width=\linewidth]{Projet_partie_B/05_evol_prev_top5.png}
     \caption{Évolution de la prévalence des 5 pathologies principales}
     \label{fig:evol_prev_top5}
   \end{minipage}
   \hfill
-  \begin{minipage}[t]{0.48\textwidth}
-    \small
-    Cette figure montre :
     \begin{itemize}
       \item Diabète en hausse (de ~8,5 \% à ~9 \%), indicateur de progression continue.  
-      \item Cardiovasculaires stables ~5 \%, cancers (~3 \%), neurologiques (~2 \%) et psychiatriques (~1,8 \%) en légère baisse.  
-      \item Différentes dynamiques suggèrent évolutions distinctes d’incidence ou de prise en charge.  
+      \item Cardioneurovasculaires stables ~5 \%, cancers (~3 \%), neurologiques (~2 \%) et psychiatriques (~1,8 \%) en légère baisse.  
+      \item Différentes dynamiques suggèrent des évolutions distinctes d’incidence ou de prise en charge.  
     \end{itemize}
-  \end{minipage}
 \end{figure}
 
 \begin{figure}[H]
   \centering
-  \begin{minipage}[t]{0.48\textwidth}
+  \begin{minipage}[t]{1\textwidth}
     \centering
     \includegraphics[width=0.6\linewidth]{Projet_partie_B/07_pie_sexe_patho.png}
     \caption{Répartition hommes/femmes pour « Cancers »}
     \label{fig:pie_sexe}
   \end{minipage}
-  \hfill
-  \begin{minipage}[t]{0.48\textwidth}
-    \small
-    Cette figure montre :
     \begin{itemize}
       \item Légère prédominance féminine (~52 \%) parmi les patients atteints de cancers.  
-      \item Répartition presque équilibrée, reflétant la distribution par sexe selon types de cancer.  
+      \item Répartition presque équilibrée, reflétant la distribution par sexe selon les types de cancer.  
     \end{itemize}
-  \end{minipage}
 \end{figure}
 
 \begin{figure}[H]
   \centering
-  \begin{minipage}[t]{0.48\textwidth}
+  \begin{minipage}[t]{1.2\textwidth}
     \centering
     \includegraphics[width=\linewidth]{Projet_partie_B/08_scatter_pop_vs_patients.png}
     \caption{Population vs nombre de patients (Cancers)}
     \label{fig:scatter_pop_patients}
   \end{minipage}
-  \hfill
-  \begin{minipage}[t]{0.48\textwidth}
-    \small
-    Cette figure montre :
     \begin{itemize}
-      \item Corrélation positive mais dispersion forte : plus de population, plus de cas, mais variabilité importante.  
+      \item Corrélation positive mais dispersion forte : plus de population, plus de cas, mais variabilité importante. 
       \item Pente de régression faible : +10 000 hab ≈ +200 cas, dépendance modérée.  
       \item Territoires très peuplés montrent des prévalences hétérogènes.  
     \end{itemize}
-  \end{minipage}
+
 \end{figure}
 
 \begin{figure}[H]
   \centering
-  \begin{minipage}[t]{0.48\textwidth}
+  \begin{minipage}[t]{0.8\textwidth}
     \centering
     \includegraphics[width=\linewidth]{Projet_partie_B/09_boxplot_patho1.png}
     \caption{Prévalence par pathologie (niv.1)}
     \label{fig:boxplot_patho1}
   \end{minipage}
-  \hfill
-  \begin{minipage}[t]{0.48\textwidth}
-    \small
-    Cette figure montre :
     \begin{itemize}
-      \item Diabète IQR large (4–20 %), plus de variabilité départementale.  
-      \item Cardiovasculaires avec outliers extrêmes (>60 %).  
-      \item Insuffisance rénale et Covid-19 très concentrées à faible taux (<5 %).  
+      \item Diabète : Ecart Interquartile large (4–20 \%), plus de variabilité départementale.  
+      \item Cardioneurovasculaires avec outliers extrêmes (>60 \%).
+      \item Insuffisance rénale et Covid-19 très concentrées à faible taux (<5 \%).  
     \end{itemize}
-  \end{minipage}
 \end{figure}
 
 \subsection{Conclusions Partie B}
 \begin{itemize}
-  \item Les maladies cardioneurovasculaires et les cancers dominent en nombre de patients ; le diabète présente une prévalence de plus de 8 %.  
-  \item Sur la carte, certaines régions (ex. Île-de-France, Hauts-de-France) affichent des prévalences plus élevées.  
-  \item La heatmap âge–sexe montre une augmentation nette de la prévalence avec l'âge et une légère surreprésentation masculine dans les classes âgées.  
-  \item Les évolutions temporelles révèlent une hausse du diabète depuis 2019 et une stabilité relative pour les autres pathologies.  
-  \item La distribution par département confirme une variabilité régionale notable (outliers identifiés).  
+  \item Les maladies cardioneurovasculaires et les cancers restent les pathologies les plus fréquentes, avec respectivement plus de 16 M et 11 M de patients en 2022, tandis que le diabète présente une prévalence approchant 9 \%.  
+  \item La cartographie révèle des disparités régionales marquées : certaines zones métropolitaines (Grand Est, Bourgogne‑Franche‑Comté, Hauts‑de‑France) enregistrent des prévalences plus élevées que la moyenne nationale.  
+  \item La heatmap par âge et sexe montre une progression régulière de la prévalence avec l’âge et une légère prédominance masculine chez les seniors.  
+  \item L’évolution temporelle (2019–2022) met en évidence une montée constante du diabète, alors que les autres pathologies se stabilisent ou varient faiblement.  
+  \item Les distributions départementales confirment une forte hétérogénéité locale, avec des outliers indiquant des territoires à risque accru.  
 \end{itemize}
 
 \section*{Conclusions Globales}
-Les analyses confirment l'intérêt de R pour l'exploration rapide et la modélisation. La Partie A met en évidence l'impact météorologique sur la demande énergétique, tandis que la Partie B décrit finement la répartition des pathologies à l'échelle nationale. Les méthodologies graphiques et spatiales permettent d'illustrer efficacement les tendances et disparités.
+Cette étude illustre la puissance de R pour l’analyse statistique.  
+\begin{itemize}
+  \item \textbf{Partie A :} la régression simple montre que la température moyenne explique près de 69 \% de la variabilité du pic de consommation électrique, soulignant l’importance du prévisionnel hivernal.  
+  \item \textbf{Partie B :} l’exploration des données de santé met en lumière les pathologies prioritaires, leurs disparités géographiques, et leurs évolutions démographiques.  
+\end{itemize}
+Les approches graphiques (séries temporelles, heatmaps, cartographies) et modélisation fournissent une base solide pour orienter les décisions en politique énergétique et en santé publique.  
+
 
 \newpage
 
@@ -442,11 +431,9 @@ Les analyses confirment l'intérêt de R pour l'exploration rapide et la modéli
   \hfill
   \begin{minipage}[t]{0.48\textwidth}
     \small
-    Cette figure montre :
     \begin{itemize}
       \item Diabète en nette hausse de 2019 à 2022.  
-      \item Cancers stables et légèrement croissants, cardiovasculaires constants avec un léger creux en 2021.  
-      \item Hospitalisation Covid-19 absente en 2019, apparue en 2020, puis stabilisée.  
+      \item Cancers stables et légèrement croissants, cardiovasculaires constants avec un léger creux en 2021.
     \end{itemize}
   \end{minipage}
 \end{figure}
